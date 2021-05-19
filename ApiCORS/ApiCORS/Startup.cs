@@ -16,6 +16,8 @@ namespace ApiCORS
 {
     public class Startup
     {
+        private readonly string _MyCors = "MyCors";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -32,6 +34,14 @@ namespace ApiCORS
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiCORS", Version = "v1" });
             });
+
+            services.AddCors(options => 
+            {
+                options.AddPolicy(_MyCors, policy =>
+                {
+                    policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost" || new Uri(origin).Host == "127.0.0.1");
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +57,8 @@ namespace ApiCORS
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(_MyCors);
 
             app.UseAuthorization();
 
